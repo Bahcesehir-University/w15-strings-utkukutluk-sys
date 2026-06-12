@@ -127,10 +127,13 @@ int countWords(const string& text) {
 // Example: replaceChar("banana", 'a', 'o') -> "bonono"
 string replaceChar(const string& text, char from, char to) {
     // TODO: copy the string and swap matching characters.
-    string result=text;
-    for (int i=0;i<=result.size()-1;i++) {
-        if (result[i]==from) {
-            result[i]=to;
+    string result;
+    for (char c :text) {
+        if (c==from) {
+            result+=to;
+        }
+        else {
+            result+=c;
         }
     }
     return result; // TODO: replace
