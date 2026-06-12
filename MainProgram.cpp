@@ -107,9 +107,16 @@ int countWords(const string& text) {
     // TODO: walk through the string tracking when you move from a space
     // into a non-space character (that marks the start of a new word).
     int count=0;
+    bool inword=false;
     for (char c: text) {
-        if ((c>='a' && c<='z') || (c>='A' && c<='Z'))
-            count++;
+        if (c !=' ' ) {
+            if (inword==false) {
+                count++;
+                inword=true;
+            }
+        } else {
+            inword=false;
+        }
     }
     return count; // TODO: replace
 }
@@ -177,7 +184,7 @@ int countLinesInFile(const string& filename) {
     int count=0;
     ifstream inFile(filename);
     if (!inFile.is_open()) {
-        return 0;
+        return -1;
     }
     string line;
     while (getline(inFile, line)) {
@@ -226,7 +233,7 @@ string censorWord(const string& filename, const string& target) {
     ifstream in(filename);
     if (!in.is_open()) return "";
     in.close();
- 
+
     vector<string> lines = readLines(filename);
     string output;
     for (size_t li = 0; li < lines.size(); li++) {
