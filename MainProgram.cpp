@@ -39,7 +39,14 @@ using namespace std;
 int countVowels(const string& text) {
     // TODO: loop over each character and count vowels.
     // Hint: compare against "aeiouAEIOU" or lowercase the char first.
-    return 0; // TODO: replace
+    int count = 0;
+   for (char c: text) {
+       char lc=(c >='A' && c<='Z') ? (char) (c+32) : c;
+       if (lc=='a' || lc=='e' || lc=='i' || lc=='o' || lc=='u') {
+           count++;
+       }
+   }
+    return count; // TODO: replace
 }
 
 // toUpperCase: return a NEW string with every letter converted to uppercase.
@@ -47,7 +54,12 @@ int countVowels(const string& text) {
 string toUpperCase(const string& text) {
     // TODO: build a result string. For each char, if it is 'a'..'z',
     // convert it to uppercase by subtracting 32 (or use toupper).
-    return ""; // TODO: replace
+    string result=text;
+    for (char& c: result) {
+        char uc=(c>='a' && c<='z') ? (char) (c-32) : c;
+        c=uc;
+    }
+    return result; // TODO: replace
 }
 
 // ------------------------------------------------------------------------
@@ -59,7 +71,11 @@ string toUpperCase(const string& text) {
 // Example: "hello" -> "olleh"
 string reverseString(const string& text) {
     // TODO: build the reversed string (loop from the end, or swap).
-    return ""; // TODO: replace
+    string result;
+    for (int i=(int)text.size()-1;i>=0;i--) {
+        result += text[i];
+    }
+    return result;
 }
 
 // Exercise 2
@@ -68,7 +84,19 @@ string reverseString(const string& text) {
 // (do not strip spaces). Example: "level" -> true, "Level" -> false.
 bool isPalindrome(const string& text) {
     // TODO: compare characters from both ends moving inward.
-    return false; // TODO: replace
+    int left=0;
+    int right=text.size()-1;
+    while (left < right) {
+        if (text[left] != text[right]) {
+            return false;
+        }
+        if (text[left] == text[right]) {
+            left++;
+            right--;
+        }
+    }
+    return true;
+     // TODO: replace
 }
 
 // Exercise 3
@@ -78,7 +106,12 @@ bool isPalindrome(const string& text) {
 int countWords(const string& text) {
     // TODO: walk through the string tracking when you move from a space
     // into a non-space character (that marks the start of a new word).
-    return 0; // TODO: replace
+    int count=0;
+    for (char c: text) {
+        if ((c>='a' && c<='z') || (c>='A' && c<='Z'))
+            count++;
+    }
+    return count; // TODO: replace
 }
 
 // Exercise 4
@@ -87,7 +120,13 @@ int countWords(const string& text) {
 // Example: replaceChar("banana", 'a', 'o') -> "bonono"
 string replaceChar(const string& text, char from, char to) {
     // TODO: copy the string and swap matching characters.
-    return ""; // TODO: replace
+    string result=text;
+    for (int i=0;i<=result.size()-1;i++) {
+        if (result[i]==from) {
+            result[i]=to;
+        }
+    }
+    return result; // TODO: replace
 }
 
 // ------------------------------------------------------------------------
@@ -100,7 +139,15 @@ string replaceChar(const string& text, char from, char to) {
 // Return true on success, false if the file could not be opened.
 bool writeLines(const string& filename, const vector<string>& lines) {
     // TODO: open an ofstream, check is_open(), write each line + "\n".
-    return false; // TODO: replace
+    ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        return false;
+    }
+    for (const string& line : lines) {
+        outFile << line << "\n";
+    }
+    outFile.close();
+    return true;
 }
 
 // Exercise 6
@@ -110,6 +157,15 @@ bool writeLines(const string& filename, const vector<string>& lines) {
 vector<string> readLines(const string& filename) {
     vector<string> result;
     // TODO: open an ifstream, use getline() in a loop to fill 'result'.
+    ifstream outFile(filename);
+    if (!outFile.is_open()) {
+        return  result;
+    }
+    string line;
+    while (getline(outFile, line)) {
+        result.push_back(line);
+    }
+    outFile.close();
     return result; // TODO: replace contents
 }
 
@@ -118,7 +174,17 @@ vector<string> readLines(const string& filename) {
 // cannot be opened, return -1.
 int countLinesInFile(const string& filename) {
     // TODO: open the file, count lines with getline(). Return -1 on fail.
-    return -1; // TODO: replace
+    int count=0;
+    ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        return 0;
+    }
+    string line;
+    while (getline(inFile, line)) {
+        count++;
+    }
+    inFile.close();
+    return count; // TODO: replace
 }
 
 // ------------------------------------------------------------------------
@@ -132,7 +198,17 @@ int countLinesInFile(const string& filename) {
 // Tip: you may reuse countWords() and readLines().
 int wordCountInFile(const string& filename) {
     // TODO: read the file and sum the word counts of each line.
-    return -1; // TODO: replace
+    int nwords=0;
+    ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        return -1;
+    }
+    vector<string> lines=readLines(filename);
+    for (const string& line: lines) {
+        nwords+=countWords(line);
+    }
+    inFile.close();
+    return nwords; // TODO: replace
 }
 
 // Challenge B
@@ -147,7 +223,35 @@ string censorWord(const string& filename, const string& target) {
     // TODO: read lines, split each into tokens by spaces, replace matching
     // tokens with '*' repeated target.length() times, rejoin with spaces,
     // then join the lines with '\n'.
-    return ""; // TODO: replace
+    ifstream in(filename);
+    if (!in.is_open()) return "";
+    in.close();
+ 
+    vector<string> lines = readLines(filename);
+    string output;
+    for (size_t li = 0; li < lines.size(); li++) {
+        const string& line = lines[li];
+        string rebuilt;
+        string token;
+        // walk the line and split on spaces, preserving single-space joins
+        for (size_t i = 0; i <= line.size(); i++) {
+            if (i == line.size() || line[i] == ' ') {
+                if (!token.empty()) {
+                    if (token == target)
+                        rebuilt += string(target.size(), '*');
+                    else
+                        rebuilt += token;
+                    token.clear();
+                }
+                if (i < line.size()) rebuilt += ' ';
+            } else {
+                token += line[i];
+            }
+        }
+        output += rebuilt;
+        if (li + 1 < lines.size()) output += "\n";
+    }
+    return output;
 }
 
 // ========================================================================
